@@ -1,3 +1,5 @@
+a very simple file syste implementation as described in the ass1.txt file
+
 vsfs.b is the initial try.
 
 vsfs_v1.b is improved, and I got 100% point from this improve version.

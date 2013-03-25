@@ -1,0 +1,51 @@
+Implement a very basic file system, as discussed in class.
+
+Make sure you create programmer-friendly functions for all
+the necessary options. Even though we want an interactive
+environment for user controlled testing, the ultimate aim
+is to make a useful system that provides something like the
+functionality of the unix calls open(), read(), write(),
+close(), etc. for use in programs.
+
+Necessary operations:
+
+  Initialise the file system, getting a new disc ready for 
+     use, or clearing an old disc that is full of rubbish.
+
+  List all useful information in the root directory.
+
+  Search the root directory, retrieving the information for
+     a particular file.
+
+  Create a new file. It is acceptable at this stage to
+     insist that the file's contents come from a real unix
+     file (magnetic tape) at the time of creation.
+
+  Retrieve and show the contents of a file.
+
+  Delete a file - just mark it as non-existent.
+
+The functions and data structures, and how to operate your
+program must be documented sufficiently that we can tell how
+to try it out before making a detailed inspection of your
+code.
+
+Recommendation: make a convenience function something
+like tape_to_disc(tape_file_name, disc_file_name) that
+does all the work of creating a disc file that is an
+exact copy of a "magnetic tape" file, and another one
+that does the opposite: copy a disc file exactly to
+tape. Those functions will help to test your essential
+functions, and could be very useful in the future.
+
+Provide a very basic interactive interface to your program,
+allowing the user to select which operation is to be performed
+and to provide file names etc. This does not need to be fancy,
+just usable. Perhaps offer the user a menu of things to do.
+
+The deadline for this is short because it is mostly just
+putting together the demonstrations you saw in class, to
+get you safely started with something practical.
+
+Include in your submission a transcript (the unix "script"
+command is good for that) of a test run.
