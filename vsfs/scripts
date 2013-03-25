@@ -1,0 +1,150 @@
+19:22 ~/assignment > cat version2run 
+Script started on Fri Mar  1 19:20:45 2013
+19:20 ~/assignment > run vsfs
+
+
+   Hello, this is a very simple file system version 0.0
+Following is the operations it now support: 
+	'0'	Initialize the disc
+	'1'	List the root directory files
+	'2'	Creating a new file
+	'3'	Read a file by file name
+	'4'	Delete a file
+	'5'	Exit the file system
+please select a operation: 1
+name           st     fd     len
+please select a operation: 0
+Disk 1 initialized!!! total available blocks = 100
+please select a operation: 1
+name           st     fd     len
+please select a operation: 2
+Please enter the new file name to create(no more than 23 chars!): 
+filename1
+Please enter the tape name: 
+1.b
+file entry created!! (file size is unkown = 0) 
+loading '1.b' ...
+load status = 1
+tape '1.b' succesfully loaded into filesystem!
+file entry updated!! (file size = 108) 
+please select a operation: 2
+Please enter the new file name to create(no more than 23 chars!): 
+filename2
+Please enter the tape name: 
+1.b
+file entry created!! (file size is unkown = 0) 
+loading '1.b' ...
+load status = 1
+tape '1.b' succesfully loaded into filesystem!
+file entry updated!! (file size = 108) 
+please select a operation: 2
+Please enter the new file name to create(no more than 23 chars!): 
+filename3
+Please enter the tape name: 
+vsfs.b
+file entry created!! (file size is unkown = 0) 
+loading 'vsfs.b' ...
+load status = 1
+tape 'vsfs.b' succesfully loaded into filesystem!
+file entry updated!! (file size = 7818) 
+please select a operation: 2
+Please enter the new file name to create(no more than 23 chars!): 
+filename4
+Please enter the tape name: 
+2.b
+file entry created!! (file size is unkown = 0) 
+loading '2.b' ...
+load status = 1
+tape '2.b' succesfully loaded into filesystem!
+file entry updated!! (file size = 140) 
+please select a operation: 1
+name           st     fd     len
+'filename1'    1      10     108
+'filename2'    1      11     108
+'filename3'    1      12     7818
+'filename4'    1      28     140
+please select a operation: 3
+Please enter the file name to read(no more than 23 chars!): 
+filename1
+file filename1 content:
+ import "io" 
+
+let start() be 
+
+{ out("Greetings, Human.\n"); 
+
+ out("Now go away and leave me alone.\n") } 
+
+
+
+::rearead file finished!!!
+please select a operation: 3
+Please enter the file name to read(no more than 23 chars!): 
+filename3
+file filename3 content: 
+import "io"
+
+manifest
+{ total_block_sz = 6000,
+  bytes_per_block = 512,
+  words_per_block = 128,
+  first_data_block = 10,
+  fnamelen = 6,
+  root_dir_bn = 4,
+  sizeof_dirent = 8,
+  dirent_name = 0,
+  dirent_status = byte 23,
+  dirent_fb = 6,
+  dirent_sz = 7 }
+
+static { n = 0, m = 0 }//n is the total directory entry, m is the total disc block occupied
+
+
+::::Print all long source program get read from tape omitted
+
+
+            break;
+
+    }
+    outs("please select a operation: ");
+  }
+} 
+
+
+
+::rearead file finished!!!
+please select a operation: 4
+Please enter the file name to delete(no more than 23 chars): 
+filename1
+filename1 deleted!
+please select a operation: 1
+name           st     fd     len
+'filename2'    1      11     108
+'filename3'    1      12     7818
+'filename4'    1      28     140
+please select a operation: 4
+Please enter the file name to delete(no more than 23 chars): 
+filename4
+filename4 deleted!
+please select a operation: 1
+name           st     fd     len
+'filename2'    1      11     108
+'filename3'    1      12     7818
+please select a operation: 4
+Please enter the file name to delete(no more than 23 chars): 
+filename3
+filename3 deleted!
+please select a operation: 1
+name           st     fd     len
+'filename2'    1      11     108
+please select a operation: 4
+Please enter the file name to delete(no more than 23 chars): 
+filename2
+filename2 deleted!
+please select a operation: 1
+name           st     fd     len
+please select a operation: 5
+19:22 ~/assignment > exit
+exit
+
+Script done on Fri Mar  1 19:22:44 2013
