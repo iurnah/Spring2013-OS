@@ -1,0 +1,30 @@
+A Sensible File System.  
+
+There must be no limit to the size of a file beyond the obvious
+limits imposed by the size of the disc.
+
+Free blocks must be properly managed so that when a file is deleted
+the blocks it occupied are available for re-use.
+
+Access to the data in a file must be efficient.
+
+Do not use contiguous allocation.
+
+Once a file has been created, it must be possible to add data to it
+at any time, without limit.
+
+Directories are just like any other file, but with a special data format.
+
+Files have tags in their metadata so that the system will know at
+least whether they are directories or regular data files.
+
+
+Required operations, provided as a library of functions:
+   Create a file
+   Open an existing file
+   Delete a file
+   Create a directory
+   Write N bytes to a file
+   Read N bytes from a file
+   Set file position (so, for example, the next write will be
+                      appended to the end).
