@@ -1,4 +1,7 @@
-This version has improved the previous version of vsfs.b
+vsfs.b is the initial try.
+
+vsfs_v1.b is improved, and I got 100% point from this improve version.
+
 The improvement including:
 
 1. Read tapes larger than a single block. This has been done by allocating
