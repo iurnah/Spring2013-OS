@@ -5,8 +5,8 @@ manifest
   bytes_per_block = 512,
   words_per_block = 128,
   first_data_block = 10,
-  root_dir_bn = 4,
-  sizeof_dirent = 8,
+  root_dir_bn = 4,		//root dir block number
+  sizeof_dirent = 8,	//8 words for each dirent
   dirent_name = 0,
   dirent_status = byte 23,
   dirent_fb = 6,

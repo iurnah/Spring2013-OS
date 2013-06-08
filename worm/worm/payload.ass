@@ -1,0 +1,16 @@
+      .makeexe
+
+      load r1, 'A'
+loop: type r1
+      add  r1, 1
+      comp r1, 'Z'
+      jcond leq, loop
+      type '\'
+      .data 0x12345678
+      .data 0x12345678
+      .data 0x12345678
+      .data 0x12345678
+      .data 0x12345678
+      .data 0x7FFFFFF0
+      type '\n'
+

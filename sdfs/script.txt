@@ -1,0 +1,148 @@
+7:10 ~/assignment > com sdfs_v1
+ok
+17:10 ~/assignment > run sdfs_v1
+
+
+ Hello, this is a sensible file system which support
+    Support the following operations(commands):
+ 	format --format a physical disc
+ 	load   --load a ready to use disc
+ 	touch  --create a blank file
+ 	mkdir  --create a directory
+ 	cd     --change directory
+ 	ls     --list directory contents
+ 	find   --find file by name in current directory
+ 	write  --write content to file
+ 	show   --read content from file
+ 	delete --delete a file
+ 	q      --read content from file
+> l
+unrecognised command 'l'
+say format, load, or q
+> format
+which disc unit? 1
+disc unit 1, 6000 blocks
+disc label (max 32 chars)? disc1
+size (in blocks) of inode table ? 2
+size (in blocks) of root directory? 2
+root dir name? .
+blockmap_nblocks=47
+disc 1 formated!!!
+root direcotry name = .
+rui-sdfs> ls
+  0    1          0     25 .                 0
+  1    1          0      0 ..                1
+0 files
+rui-sdfs> q
+17:11 ~/assignment > run sdfs_v1
+
+
+ Hello, this is a sensible file system which support
+    Support the following operations(commands):
+ 	format --format a physical disc
+ 	load   --load a ready to use disc
+ 	touch  --create a blank file
+ 	mkdir  --create a directory
+ 	cd     --change directory
+ 	ls     --list directory contents
+ 	find   --find file by name in current directory
+ 	write  --write content to file
+ 	show   --read content from file
+ 	delete --delete a file
+ 	q      --read content from file
+> load
+which disc unit? 1
+disc unit 1, 6000 blocks
+disc label 'disc1'
+inode table blocks 1 to 2
+free blocks blockmap 3 to 49
+root directory blocks 50 to 51
+first free block: 52
+rui-sdfs> ls
+  0    1          0     25 .                 0
+  1    1          0      0 ..                1
+0 files
+rui-sdfs> touch
+file name? file1inroot
+length (in bytes)? 2590
+file size only need less than 9 blocks
+	entry 2 firstblock=52 length=2590
+rui-sdfs> ls
+  0    1          0     25 .                 0
+  1    1          0      0 ..                1
+  2    0       2590      6 file1inroot       2
+1 files
+rui-sdfs> mkdir
+directory name? dir1inroot
+
+	inode=3, dirname=dir1inroot
+rui-sdfs> ls
+  0    1          0     25 .                 0
+  1    1          0      0 ..                1
+  2    0       2590      6 file1inroot       2
+  3    1          0     11 dir1inroot        3
+2 files
+rui-sdfs> chdir
+unrecognised command 'chdir'
+	say ls, touch, find, delete, write, cat, mkdir, cd or exit
+rui-sdfs> cd
+which directory? dir1inroot
+inodentry ! inode_firstblockptrs=58
+	change to dir=dir1inroot inode=3, firstblock=58
+rui-sdfs> ls
+  0    1          0     11 .                 3
+  1    1          0     25 ..                0
+0 files
+rui-sdfs> mkdir
+directory name? dir1indir1
+
+	inode=4, dirname=dir1indir1
+rui-sdfs> ls
+  0    1          0     11 .                 3
+  1    1          0     25 ..                0
+  2    1          0     11 dir1indir1        4
+1 files
+rui-sdfs> mkdir
+directory name? dir2indir1
+
+	inode=5, dirname=dir2indir1
+rui-sdfs> make
+unrecognised command 'make'
+	say ls, touch, find, delete, write, cat, mkdir, cd or exit
+rui-sdfs> touch
+file name? file1indirectory1
+length (in bytes)? ls513
+file size only need less than 9 blocks
+	entry 6 firstblock=64 length=513
+rui-sdfs> ls
+  0    1          0     11 .                 3
+  1    1          0     25 ..                0
+  2    1          0     11 dir1indir1        4
+  3    1          0     11 dir2indir1        5
+  4    0        513      2 file1indirectory  6
+3 files
+rui-sdfs> cd
+which directory? ..
+inodentry ! inode_firstblockptrs=50
+	change to dir=.. inode=0, firstblock=50
+rui-sdfs> ls
+  0    1          0     25 .                 0
+  1    1          0      0 ..                1
+  2    0       2590      6 file1inroot       2
+  3    1          0     11 dir1inroot        3
+2 files
+rui-sdfs> find
+file name? file1inroot
+   inodenum=2 firstblock=52 length=2590
+rui-sdfs> write
+file name? file1inroot
+in open function !
+in open function !
+Open: in the if !!
+Open: f ! file_nblock=6
+Open: f ! file_datablockptr1=52
+write from position(nth bytes)? 500
+how many bytes to write? 600
+write: 3. thisblockn=54
+write file compeleted!!
+write 600 bytes finished!

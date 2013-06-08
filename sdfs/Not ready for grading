@@ -1,0 +1,6 @@
+the code is compiling the following need more time to implement and debug
+1. write n bytes from a particular file position
+2. read n bytes from a particular file position
+3. change current directory
+4. delete current directory
+5. delete a file that larger than the first level blocks (total is 9)

@@ -1,0 +1,43 @@
+I have completely redesigned my implementation of sensible disc file system,
+below is a brief discussion about some important point I learned from this
+assignment
+
+1. Free block manager:
+
+free block manager is a large array, the element of which store the block number
+it is created on disc when the disc formated.
+I used two indexes to track the free blocks, one to index the first element
+contain free block in the big array and the other to index the first element can
+be overwirten once the block is freed when the coresponding file has been deleted.
+
+This idea is simple but works. At any time, the array value after the first_free
+are all free, the array value between the first_free and the next_to_overwrite
+are blocks has been used, all the array values (block number) before the
+next_to_overwrite are reused block numbers .
+
+2. Unlimited directory depth support:
+by changing the ptr to the file system data structure fs ! fs_rootdir, current
+directory can be easily changed back and forth between parent directory and current
+directory. Is make both possible and easy to create new file in any directory. 
+
+3. Set position, write and read file implementation
+
+I stick on the following rules to allocate blocks for different size of the files:
+	for small files (less than 9 blocks), use the 9 direct block indexes in the inode
+	for media files (greater than 9 but less than 128), use ONLY the first level index
+	for large files (greater than 128 blocks), use ONLY the second level index
+
+one mistake (inappropriate design I had) is to make use of the first level
+indexing as well as the second level indexing while create a large file. This
+create unnecessary complexity to implement the lseek function, because it should
+handle the case when to set the file position in first level indexed blocks,
+while the bytes need to write further down to the second level indexed blocks.
+The code get very complecated and I just go back to this simpler implementation.
+
+For list file output format:
+	--the first column is the order of the file in current directory
+	--the second column is type of the file, 1 is directory, 0 is regular file
+	--the third column is the total bytes of the file
+	--the fourth column is the total blocks the file occupied.
+	--the fifth column is file name,
+	--the last column is the inode number of the corresponding file

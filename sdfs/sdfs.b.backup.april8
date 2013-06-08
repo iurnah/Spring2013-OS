@@ -767,8 +767,7 @@ let write(f, ptr, num) be
       //f ! file_nblocks +:= 1; // todo: may using a counter
       test f ! file_nblockswriten <= 9 then
 		{ next_block_index := inode_firstblockptrs + (f ! file_nblockswriten);
-          f ! file_thisblockn := inodentry ! next_block_index;
-		  out("f ! file_thisblockn=%d\n", f ! file_thisblockn) }
+          f ! file_thisblockn := inodentry ! next_block_index }
 	  else test f ! file_nblockswriten <= 137 then
 		{ index_block_1 := newvec(words_per_block);
 		  x := devctl(dc_disc_read, f ! file_filesys ! fs_discnum,

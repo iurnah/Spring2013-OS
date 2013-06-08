@@ -1,0 +1,14 @@
+
+ad r1, 'A'
+loop: type r1
+      add  r1, 1
+      comp r1, 'Z'
+      jcond leq, loop
+      type '\'
+      .data 0xABCD1234
+      .data 0xABCD1234
+      .data 0xABCD1234
+      .data 0xABCD1234
+      .data 0xABCD1234
+      .data 0x7FFFFFEE
+

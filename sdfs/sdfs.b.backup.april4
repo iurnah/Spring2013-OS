@@ -116,14 +116,11 @@ manifest	//file = open file, information used by higher level function
 			// open, read, write, close. Includes buffer space
 { file_mode = 0,		//R and W mode
   file_filesys = 1,		//ptr to the in-mem fs structure
-  file_inode = 2,
-  file_thisblockn = 3,	//current block of the file
-  file_remaining = 4,	//size of the file
-  file_sizetype = 5,    //small=0, medium=1, large=2
-  file_position = 6,	//new open position=0 
-  file_nblockswriten = 7,
-  file_buffer = 8,		//keep the file buffer address
-  sizeof_file = 9 + 128 }
+  file_thisblockn = 2,	//first block of the file
+  file_remaining = 3,	//size of the file
+  file_position = 4,	//new open position=0 
+  file_buffer = 5,		//keep the file buffer address
+  sizeof_file = 6 + 128 }
 
 /* error messages */
 let last_error = nil,
@@ -303,13 +300,13 @@ let format(fs) be
   zstr_to_nzstr("..", d + sizeof_rde + rde_name, rde_namesize);
   d +:= sizeof_rde;		//temperory go to second entry
   rde_status of d := rde_exists;//for consistancy with directory
-  d ! rde_inodenum := 0;//inode of the second entry set equal root inode (useless)
+  d ! rde_inodenum := 1;//inode of the second entry (useless)
   d -:= sizeof_rde;		//go back to the beginning
   fs ! fs_rootdir := d;	//hold in-mem address of root directory
+
   d := newvec(n * 128);
   for i = 0 to n*128-1 do
     d ! i := 0;
-
   //initial first inode for root dir
   inode_type of d := inode_dir;
   inode_status of d := inode_exists;
@@ -317,7 +314,7 @@ let format(fs) be
   d ! inode_nblock := 25;	//9+firstlevel(16)
   d ! inode_time := 0;
   d ! inode_ctime := 0;
-  d ! inode_firstblockptrs := 1;// hard coded to point to the first block
+  d ! inode_firstblockptrs := 200;//todo: dynamically allocate root dir size
   rootparent_type := sizeof_inode * 4;//pay attention to this indexing thing
   rootparent_status := sizeof_inode * 4 + 1;//pay attention to this 
   byte rootparent_type of d := inode_dir;// the parent dir of root(no)
@@ -389,9 +386,9 @@ let listroot(fs) be
       inodenum := entry ! rde_inodenum; 
 	  inodentry := inodetable + inodenum * sizeof_inode; 
       //i | type | filesize | numblocks | time | ctime | name
-	  out("%2d %2d %10d %5d %5d %5d %16s %2d\n", i, inode_type of inodentry, 
+	  out("%2d %2d %10d %5d %5d %5d %32s\n", i, inode_type of inodentry, 
            inodentry ! inode_size, inodentry ! inode_nblock,
-		   inodentry ! inode_time, inodentry ! inode_ctime, fname, inodenum); 
+		   inodentry ! inode_time, inodentry ! inode_ctime, fname); 
       count +:= 1 }
     entry +:= sizeof_rde }
    out("%d files\n", count) }
@@ -500,6 +497,7 @@ let makefile(fs, fname, length, info) be
 			for j = 0 to 8 do
 			{ inodetable ! (inode_firstblockptrs + j) := fs ! fs_firstfree;
 			  fs ! fs_firstfree +:= 1 } 
+			//todo: should make use of the first level also
 			inodetable ! inode_firstlevelptr := fs ! fs_firstfree;//indexbloc
 			fs ! fs_firstfree +:= 1;	// the freeblock is incresed by 1
 			//prepare an index block
@@ -575,17 +573,17 @@ let makefile_ui(fs) be
 let makedir(fs, dirname, info) be
 { let entry = fs ! fs_rootdir,
 	  nentries = fs ! fs_rootsize * 128 / sizeof_rde;
-  let curdirinode = entry ! rde_inodenum;//get current dir inode number
   //get inode table
   let inodetable = fs ! fs_inodetable,
       numinodentry = fs ! fs_inodesize * 128 / sizeof_inode,
       inodenum, inodentry;
-  let b = newvec(words_per_block), x;
+
   for i = 0 to nentries-1 do
   { if rde_status of entry = 0 then
     { zstr_to_nzstr(dirname, entry + rde_name, rde_namesize); //1. rde name
+	  // update root directory entry todo:take care of making the directory
 	  rde_status of entry := rde_exists;	//2. rde status byte
-      for i = 0 to numinodentry-1 do		//new dir inode
+      for i = 0 to numinodentry-1 do
 	  { if inode_status of inodetable = 0 then
         { inodenum := i;	//find the first available inode table entry
 		  inode_type of inodetable := inode_dir; //0 is file, 1 is dir 
@@ -596,17 +594,6 @@ let makedir(fs, dirname, info) be
 		  inodetable ! inode_ctime := 0; 
 		  inodetable ! inode_firstblockptrs := fs ! fs_firstfree;//only initialize the first ptr
 		  fs ! fs_firstfree +:= 1;
-		  //prepare the directory content block
-		  zstr_to_nzstr(".", b + rde_name, rde_namesize);
-		  rde_status of b := rde_exists; //2. rde status byte
-		  b ! rde_inodenum := inodenum; //3. rde inode number 
-		  b +:= sizeof_rde;
-		  zstr_to_nzstr("..", b + rde_name, rde_namesize);
-		  rde_status of b := rde_exists;
-		  b ! rde_inodenum := curdirinode;
-		  b -:= sizeof_rde;
-		  x := devctl(dc_disc_write, fs ! fs_discnum, 
-					  inodetable ! inode_firstblockptrs, 1, b);
 		  //reading from the block
 		  break } 
 	    inodetable +:= sizeof_inode }
@@ -630,7 +617,7 @@ let makedir_ui(fs) be
   test fi = nil then
 	out("failed: %s\n", last_error)
   else
-	out("	inode=%d, dirname=%s\n", fi ! fi_number, dirname) }
+	out("	entry %d dirname=%s\n", fi ! fi_number, dirname) }
 
 /* find the exist file */
 let findfile(fs, fname, info) be
@@ -669,16 +656,6 @@ let findfile_ui(fs) be
     out("   inodenum=%d firstblock=%d length=%d\n",
         fi ! fi_number, fi ! fi_firstblock, fi ! fi_length) }
 
-/* 
-let open(fs, fname, mode) be
-{ let inode;
-  if mode <> 'r' /\ mode <> 'w' then
-  { last_error := err_wrongmode;
-	resultis nil }
-  inode := findfile(fs, fname, info);
-  resultis inode }
-*/
-
 /* open an existing file */
 let open(fs, fname, mode) be
 { let info = vec sizeof_fi,
@@ -691,21 +668,11 @@ let open(fs, fname, mode) be
   f := newvec(sizeof_file); //create a struct for in-mem file info
   f ! file_mode := mode;
   f ! file_filesys := fs;
-  f ! file_inode := info ! fi_number; 
   f ! file_thisblockn := info ! fi_firstblock;
   f ! file_remaining := info ! fi_length;
-  f ! file_nblockswriten := 0;
-  test info ! fi_length <= inode_blocksptrsize * 512 then
-    f ! file_sizetype := 0
-  else test info ! fi_length <= (inode_blocksptrsize + words_per_block) * 512 then
-    f ! file_sizetype := 1
-  else
-    f ! file_sizetype := 2;
   f ! file_position := mode = 'w' -> 0, 512;
-  //f ! file_nblocks := (info ! fi_length + 511) / 512; 
   f ! file_buffer := f + file_buffer + 1; //file_buffer keep the buf address
   resultis f }
-
 
 /* flush the file content */
 let file_flush(f) be
@@ -744,13 +711,7 @@ let read(f, ptr, num) be
 /* write the already exist file */
 let write(f, ptr, num) be
 { let pos = f ! file_position,
-      buf = f ! file_buffer,
-      fs = f ! file_filesys;
-  let inodenum = f ! fi_number;
-  let inodetable = fs ! fs_inodetable;
-  let inodentry = inodetable + inodenum * sizeof_inode;
-  let blocks_count = 0;
-  let next_block_index, index_block_1, x;
+      buf = f ! file_buffer;
   if f ! file_mode <> 'w' then
   { last_error := err_wrongmode;
 	resultis -1 }
@@ -760,49 +721,13 @@ let write(f, ptr, num) be
   { byte pos of buf := byte i of ptr;
 	pos +:= 1;
 	if pos = 512 then
-	{ let bn = f ! file_thisblockn;//o: deal with bn > 8
-      //let nextblock = inodentry ! inode_firstblockptrs;
+	{ let bn = f ! file_thisblockn;//todo: deal with bn > 8
 	  devctl(dc_disc_write, f ! file_filesys ! fs_discnum, bn, 1, buf);
-      //here fill the file_thisblockn with the inode block pointers(1 level and 2
-      //f ! file_nblocks +:= 1; // todo: may using a counter
-      test f ! file_nblockswriten <= 9 then
-		{ next_block_index := inode_firstblockptrs + (f ! file_nblockswriten);
-          f ! file_thisblockn := inodentry ! next_block_index;
-		  out("f ! file_thisblockn=%d\n", f ! file_thisblockn) }
-	  else test f ! file_nblockswriten <= 137 then
-		{ index_block_1 := newvec(words_per_block);
-		  x := devctl(dc_disc_read, f ! file_filesys ! fs_discnum,
-					  inodentry ! inode_firstlevelptr, 1, index_block_1);
-		  next_block_index := (f ! file_nblockswriten) - 9; 
-		  f ! file_thisblockn := index_block_1 ! next_block_index }
-	  else 
-		{}
-      //else 
-      f ! file_nblockswriten +:= 1;
+	  f ! file_thisblockn := bn + 1;
 	  pos := 0 } }
   f ! file_position := pos;
   f ! file_remaining -:= num;
   resultis num }
-
-/*   else 
-		{ index_block_2 = newvec(words_per_block);
-		  x : devctl(dc_disc_read, f ! file_filesys ! fs_disnum,
-					 inodentry ! inode_secondlevelptr, 1, index_block_2);
-		  second_level_index := (f ! file_nblockswriten) - 137;
-		  
-		  
-		    }
-      test f ! file_sizetype = 0 then 
-	    f ! file_thisblockn := inodentry ! "next block ptr";
-      else test f ! file_sizetype = 1 then
-		{ let index_block = newvec(words_per_block), x;
-		  x := devctl(dc_disc_write, f ! file_filesys ! fs_disnum,
-					  inodentry ! inode_firstlevelptr , 1, index_block);
-
-		  f ! file_thisblockn := index_block ! 1 }
-	  else test f ! file_sizetype = 2 then
-		{ let }
-*/ 
 
 /* write alphabetic chars to a file */
 let writealph_ui(fs) be
@@ -847,6 +772,7 @@ let chdir(fs, dirname, info) be
 { let entry = fs ! fs_rootdir,
 	  nentries = fs ! fs_rootsize * 128 / sizeof_rde,
 	  thisname = vec rde_namesize/4+2;
+
   //get inode table
   let inodetable = fs ! fs_inodetable,
       numinodentry = fs ! fs_inodesize * 128 / sizeof_inode,
@@ -857,7 +783,7 @@ let chdir(fs, dirname, info) be
     { nzstr_to_zstr(entry + rde_name, thisname, rde_namesize);
 	  if dirname %streq thisname then			//find the entry in rde
 	  { inodenum := entry ! rde_inodenum;
-		inodentry := inodetable + inodenum * sizeof_inode;//+2 for cur dir and parent dir
+		inodentry := inodetable + inodenum * sizeof_inode; 
 		info ! fi_status := rde_status of entry;
 		info ! fi_number := inodenum;
 		info ! fi_firstblock := inodentry ! inode_firstblockptrs;
@@ -882,8 +808,7 @@ let chdir_ui(fs) be
   test fi = nil then
 	out("failed: %s\n", last_error)
   else
-	out("	change to dir=%s inode=%d, firstblock=%d\n", 
-			dirname, fi ! fi_number, fi ! fi_firstblock) }
+	out("	change to new dir=%s\n", dirname) }
 
 /* delete a file */
 let deletefile_ui() be
